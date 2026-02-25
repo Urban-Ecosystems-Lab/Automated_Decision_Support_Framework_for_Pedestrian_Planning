@@ -1,0 +1,22 @@
+Literature Review/*
+Input/
+*copy.csv
+*checkpoint.csv
+
+.DS_Store
+**/.DS_Store
+
+Input/
+Input copy/
+Input copy.zip
+Output/features_data.csv
+Output/maxview_devices_updated.csv
+
+repo-mirror.git/
+Old_Version/
+
+*.html
+*.pdf
+
+Pedestrian_model.ipynb
+Data_Collection.ipynb
