@@ -39,8 +39,8 @@ Pedestrian_Volume_Estimation/
 │
 ├── Pedestrian_model_clean.ipynb
 │
-├── Output/                               
-│   ├── final_pedestrian_data.csv
+├── Input_Data/                               
+│   └── final_pedestrian_data.csv
 │
 ├── Images/
 │   ├── Figure_1.png
@@ -53,7 +53,7 @@ Pedestrian_Volume_Estimation/
 
 ---
 
-## Project Overview
+## Repository Overview
 
 This repository contains the following notebook:
 
@@ -84,9 +84,7 @@ pip install -r requirements.txt
 
 ## Reproducing Results
 
-1. Run `Pedestrian_model.ipynb` to train models, evaluate performance, and generate outputs.
-
-Execution time may vary depending on dataset size and hardware.
+Run `Pedestrian_model.ipynb` to train models, evaluate performance, and generate outputs.
 
 ---
 
@@ -127,18 +125,7 @@ However, the raw data sources and data processing codes are not included in this
 ---
 
 ## Contact
-For questions or feedback, please email [danialchekani@arizona.edu](mailto:danialchekani@arizona.edu) or [danialchekani2000@gmail.com](danialchekani2000@gmail.com)
-
-## Contributions
-- **Danial Chekani**: Developed the full data processing and modeling pipeline, implemented all code, performed analysis, and generated figures and outputs.
-
-- **Dr. Ali Shamshiripour**: Provided research supervision and methodological guidance, and contributed feedback through review and editing.
-
-- **Dr. Jun Zhao**: Supported data-related investigation and provided input during dataset development.
-
-- **Dr. Hyunsoo Noh**: Assisted with data investigation and offered supervisory feedback during project development.
-
-- **Dr. Yao-Jan Wu**: Provided project-level administrative oversight.
+For questions or feedback, please email [shamshiripour@arizona.edu](mailto:shamshiripour@arizona.edu) or [danialchekani@arizona.edu](mailto:danialchekani@arizona.edu)
 
 ## Acknowledgements
 

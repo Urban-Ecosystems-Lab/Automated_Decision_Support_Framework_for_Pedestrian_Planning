@@ -9,8 +9,8 @@ Input/
 Input/
 Input copy/
 Input copy.zip
-Output/features_data.csv
-Output/maxview_devices_updated.csv
+Input_Data/features_data.csv
+Input_Data/maxview_devices_updated.csv
 
 repo-mirror.git/
 Old_Version/
