@@ -1,0 +1,118 @@
+{
+  "input_path": "Input_Data/final_pedestrian_data.csv",
+  "output_root": "Outputs/framework",
+  "seed": 42,
+  "model": {
+    "search_iterations": 50,
+    "cv_folds": 5,
+    "jobs": 1,
+    "compare_baselines": true,
+    "search_space": {
+      "n_estimators": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "learning_rate": [
+        0.01,
+        0.05,
+        0.1,
+        0.2
+      ],
+      "max_depth": [
+        3,
+        5,
+        7,
+        9,
+        11
+      ],
+      "min_child_weight": [
+        1,
+        3,
+        5,
+        7
+      ],
+      "subsample": [
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9,
+        1.0
+      ],
+      "colsample_bytree": [
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9,
+        1.0
+      ],
+      "reg_alpha": [
+        0,
+        0.001,
+        0.01,
+        0.1,
+        1,
+        10,
+        20,
+        50
+      ],
+      "reg_lambda": [
+        0.001,
+        0.005,
+        0.01,
+        0.1,
+        1,
+        10,
+        100,
+        500
+      ],
+      "gamma": [
+        0,
+        0.01,
+        0.1,
+        0.2,
+        0.5,
+        1
+      ]
+    },
+    "objective": "count:poisson",
+    "test_fraction": 0.2
+  },
+  "clustering": {
+    "gap_search_top_n": 10,
+    "minimum_gap_pct": 30.0,
+    "fallback_top_n": 3,
+    "feature_stability_replicates": 100,
+    "k_min": 2,
+    "k_max": 20,
+    "geography_weight": 0.5,
+    "min_intersections_per_cluster": 2
+  },
+  "patterns": {
+    "top_n": 20,
+    "max_citywide_forms": 3,
+    "bootstrap_replicates": 100,
+    "bootstrap_seed": 20260817,
+    "bootstrap_ci_level": 0.95,
+    "bootstrap_min_valid_fraction": 1.0,
+    "jobs": 1,
+    "max_segments": 5,
+    "min_points_per_segment": 25,
+    "breakpoint_candidates": 14,
+    "simplification_tolerance_pct": 10.0,
+    "retention_tolerance_pct": 10.0
+  },
+  "figures": {
+    "enabled": true,
+    "dpi": 300,
+    "basemap": false,
+    "map_crop_top_fraction": 0.3
+  }
+}

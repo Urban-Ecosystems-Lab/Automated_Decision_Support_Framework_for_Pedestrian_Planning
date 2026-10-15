@@ -1,132 +1,134 @@
-# Pedestrian_Volume_Estimation
+# Automated Pattern Identification Framework
 
-This repository contains the full modeling and data processing workflow for estimating hourly pedestrian volumes at signalized intersections using signal operations data (push-button events and related timing features) combined with built-environment, mobility, demographic, and environmental covariates.
+This repository provides an automated framework for identifying interpretable response patterns in machine-learning explanations. It fits and compares candidate functional forms to SHapley Additive exPlanations (SHAP) dependence values and reports their direction, shape, potential thresholds, and fit statistics. Citywide and cluster-level analyses help characterize relationships that vary across local conditions.
 
-The project integrates static and time-varying predictors (200+ features) to improve pedestrian volume estimation beyond push-button counts alone.
+The implementation combines XGBoost modeling, SHAP-based feature ranking, context clustering, bootstrap assessment, and parsimonious pattern selection. A pedestrian-activity case study from Tucson, Arizona, demonstrates its application to 1,708 intersection-hour observations at 237 signalized intersections.
 
-Data sources include:
+## Framework overview
 
-- **American Community Survey (ACS)**  
-  Block group–level demographic and socioeconomic context (NHGIS 5-year estimates).
+<p align="center">
+  <img src="Images/method_overview.png" alt="Automated pattern identification workflow" width="80%">
+</p>
 
-- **MaxView (event-based)**  
-  High-resolution signal operations data, including push-button activation events.
+The automated workflow:
 
-- **Meteostat**  
-  Weather observations (e.g., temperature).
+1. Receives and validates a pedestrian activity dataset.
+2. Selects XGBoost hyperparameters, evaluates predictive performance, and computes SHAP values.
+3. Selects influential clustering features from drops in ranked mean absolute SHAP importance.
+4. Groups intersections using their locations and selected predictors, choosing the cluster count by silhouette score.
+5. Fits candidate response patterns to aggregate and cluster-stratified SHAP dependence values.
+6. Exports selected forms, equations, thresholds, uncertainty summaries, diagnostic tables, and figures.
 
-- **INRIX Speed Data**  
-  Average vehicle speeds near study intersections.
+## Repository structure
 
-- **Environmental Protection Agency (EPA)**  
-  Smart Location Database indicators (e.g., activity density, national walking index, transit service density).
+| File or directory | Description |
+|---|---|
+| `pedestrian_framework.py` | Automated modeling, SHAP analysis, clustering, pattern selection, and result export |
+| `pedestrian_patterns.py` | Candidate functional forms, fitting routines, and conditional parameter diagnostics |
+| `pedestrian_figures.py` | Visual representation of pattern panels, SHAP rankings, cluster maps, and importance plots |
+| `framework_config.json` | Paths, model search space, validation settings, clustering rules, and pattern-selection controls |
+| `Pedestrian_model_patterns.ipynb` | Tucson case study: selected model, context groups, bootstrap analysis, and response-pattern figures |
+| `Input_Data/final_pedestrian_data.csv` | Prepared case-study dataset |
+| `Images/` | Framework overview and selected example figures |
 
-- **Pima Association of Governments (PAG)**  
-  Employment and land-use related contextual data.
-
-- **OpenStreetMap (OSM)**  
-  Built environment characteristics extracted within a 400-meter buffer (e.g., points of interest, sidewalk presence).
-
-- **Tree Equity Score (TES)**  
-  Urban greening and tree canopy coverage indicators.
-
----
-
-## Repository Structure
-
-```
-Pedestrian_Volume_Estimation/
-│
-├── Pedestrian_model_clean.ipynb
-│
-├── Input_Data/                               
-│   └── final_pedestrian_data.csv
-│
-├── Images/
-│   ├── Figure_1.png
-│   ├── Figure_2.png
-│   └── ...
-│
-├── requirements.txt
-└── README.md
-```
-
----
-
-## Repository Overview
-
-This repository contains the following notebook:
-
-### `Pedestrian_model_clean.ipynb`
-
-Contains the full modeling and evaluation workflow. It produces:
-
-- Model training and validation
-- Model comparisons across baselines
-- SHAP-based feature importance analysis
-- Accumulated Local Effects (ALE) analysis
-- Scenario analysis
-- All figures and analytical outputs reported in the project
-
----
+The Python framework is configured for automated analysis of prepared datasets. The pattern notebook provides a self-contained case-study analysis with specified model parameters, feature selections, and visualization settings.
 
 ## Installation
 
-To use this project, you need to have Python installed on your system. You can download Python from the [official Python website](https://www.python.org/downloads/).
-
-Once you have Python installed, you can install the required dependencies using pip. Run the following command in your terminal or command prompt:
+Use Python 3.10 or newer. From the repository directory:
 
 ```bash
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
----
+On Windows, activate the environment with `.venv\Scripts\activate`.
 
-## Reproducing Results
+The case-study notebook uses Contextily for basemap tiles. The automated framework produces maps from projected coordinates without downloading basemap tiles. Each automated run records its installed package versions in `run_summary.json`.
 
-Run `Pedestrian_model.ipynb` to train models, evaluate performance, and generate outputs.
+## Running the framework
 
----
+```bash
+# Run with reduced settings.
+python pedestrian_framework.py --quick
 
-## Selected Visuals
+# Analysis using the settings in framework_config.json.
+python pedestrian_framework.py
 
-<div style="text-align:center;margin-top:2rem;margin-bottom:2rem">
-<img src="Images/Figure_1.png" alt="Hourly Pedestrian Volumes vs. Push-Button Events" width="700" height="auto">
-</div>
+# Analysis using a separate configuration and output directory.
+python pedestrian_framework.py --config analysis_config.json --output-dir Outputs/analysis
+```
 
+The quick run uses one hyperparameter-search trial, two validation folds, two ranked features, five curve-bootstrap resamples, and up to three segments. Use the full configuration for substantive analysis. See [Input data and configuration](#input-data-and-configuration) for input requirements and configuration settings.
 
-This figure visualizes hourly pedestrian volumes alongside hourly push-button events at study intersections. It highlights the locations of devices and range of hourly pedestrian volumes and push-buttons.
+Configuration paths are resolved relative to the configuration file. An explicit `--output-dir` is resolved relative to the working directory. The default destination is `Outputs/framework/`. Each successful run replaces the previous framework results in that same directory. A failed run leaves the previous results intact. Directories without a framework manifest are never replaced.
 
----
+## Input data and configuration
 
-<div style="text-align:center;margin-top:2rem;margin-bottom:2rem">
-<img src="Images/Figure_3.png" alt="Top Features" width="700" height="auto">
-</div>
+Supply a CSV containing the five required columns: `DeviceID` (intersection identifier), `DateHour` (observation timestamp), `Latitude`, `Longitude`, and `HourlyPedCount` (nonnegative pedestrian count). All remaining columns are treated as numeric predictors. The identifier, timestamp, and coordinates are excluded from model predictors; the identifier and coordinates support intersection-level grouping and geographic clustering. Column order and dataset dimensions are read directly from the CSV; no separate schema file is required.
 
+Predictors must have meaningful names and consistent units before analysis. Complete categorical encoding and source-data integration upstream. Missing numeric values are mean-imputed within each training split for evaluation; the final explanatory model is fitted to all observations.
 
-This figure presents the top-ranked features using mean absolute SHAP values, comparing citywide importance with context-dependent importance averaged across spatial folds.
+| Configuration section | Settings |
+|---|---|
+| `model` | Objective, randomized-search space, trial count, test fraction, validation folds, and baseline comparisons |
+| `clustering` | Importance-gap search range, minimum drop, fallback count, stability resamples, cluster range, and geographic weighting |
+| `patterns` | Number of ranked features, candidate limits, segment support, breakpoint grid, bootstrap controls, and MAE tolerances |
+| `figures` | Figure generation, resolution, and number of displayed features |
 
----
+Paths and random seeds are configured at the top level. Selected model hyperparameters are saved with each run.
 
-<div style="text-align:center;margin-top:2rem;margin-bottom:2rem">
-<img src="Images/Figure_7.png" alt="Top Features" width="700" height="auto">
-</div>
+The feature-selection and clustering methods are documented at the beginning of `pedestrian_framework.py`; candidate functions and pattern-selection methods are documented at the beginning of `pedestrian_patterns.py`.
 
-This visualization shows the relationship between pedestrian activity and wait time, with citywide results indicating a decline in walking once delays exceed ~40 seconds. Context-dependent SHAP patterns remain stable between 15–60 seconds, where most observations occur, while ALE results exhibit greater variability, suggesting strong interactions with other model features.
+## Results
 
----
+Results are written to `Outputs/framework/`. Supporting tables are saved alongside a `figures/` directory containing exactly these figure types:
 
-## Data Availability
+- `shap_ranking.png`: top-N citywide mean absolute SHAP importance.
+- `shap_ranking_by_cluster.png`: citywide and equal-weight cluster-average importance.
+- `clusters.png`: intersection context groups.
+- `feature_importance_drop.png`: importance ranking and the selected clustering-feature cutoff.
+- `patterns/<feature>.png`: one four-panel comparison for each of the top-N features, showing citywide fits, equations and bootstrap statistics, cluster-stratified SHAP values, and selected cluster fits.
 
-Processed datasets used for modeling have been made publicly available.
+`patterns.top_n` controls the feature count for both the pattern plots and the ranking plots. Figure typography, colors, markers, and line widths follow the case-study pattern notebook. The map uses the notebook's marker styling and northern viewport crop. It is generated offline by default; `figures.basemap` optionally enables a grayscale base layer, and `figures.map_crop_top_fraction` controls the viewport crop. Silhouette scores are retained in `run_summary.json`.
 
-However, the raw data sources and data processing codes are not included in this repository due to usage restrictions.
+Supporting results are consolidated into six files:
 
----
+| File | Contents |
+|---|---|
+| `run_summary.json` | Configuration, selected model parameters, best search score, clustering decision and silhouette comparisons, feature-selection stability summary, provenance, and completion status |
+| `model_evaluation.csv` | Held-out and cross-validation metrics, including baseline comparisons when enabled |
+| `feature_summary.csv` | Citywide and cluster-level SHAP importance, importance gaps, selected clustering features, and selection frequencies |
+| `clusters.csv` | One row per intersection with coordinates, selected predictor means, and cluster assignment |
+| `patterns.csv` | Retained citywide and cluster patterns, equations, coefficients, direction, thresholds, full-data fit metrics, and citywide bootstrap summaries |
+| `parameter_tests.csv` | Conditional parameter and contrast tests for the retained patterns |
 
-## Contact
-For questions or feedback, please email [shamshiripour@arizona.edu](mailto:shamshiripour@arizona.edu) or [danialchekani@arizona.edu](mailto:danialchekani@arizona.edu)
+`Full-data` fit metrics describe the final fitted curves. `Bootstrap` metrics describe the resampling distribution used for citywide selection; cluster fits do not use bootstrap intervals. Detailed bootstrap replicates, unselected candidate fits, repeated ranking tables, observation-level cluster duplicates, model binaries, and raw SHAP arrays are not saved. The saved settings, seeds, selected parameters, and input fingerprint support rerunning the analysis. Observation cluster labels can be recovered by joining the input intersection identifier to `clusters.csv`.
 
-## Acknowledgements
+Generated framework results are excluded from version control. Selected study tables and figures can be shared separately in `Outputs/` and `Images/`.
 
-We would like to thank the Pima Association of Governments (PAG) and the City of Tucson for providing access to the pedestrian, signal, and employment data used in this study. Appreciation is also extended to the Arizona Department of Transportation (ADOT) and the Center for Applied Transportation Sciences (CATS) for supporting this work by providing access to crash data and speed data, and to Dr. Xiaofeng Li for his comments on the project. The opinions, findings, and conclusions in this paper are solely those of the authors and not necessarily those of PAG.
+## Example: Pedestrian activity in Tucson
+
+The Tucson application uses 1,708 intersection-hour observations from 237 signalized intersections. The prepared dataset combines pedestrian counts with traffic operations, built-environment, mobility, demographic, and environmental predictors.
+
+The case-study analysis is available in [Pedestrian_model_patterns.ipynb](Pedestrian_model_patterns.ipynb). It includes the specified XGBoost model, four context groups, ten selected determinants, bootstrap comparisons, and citywide and cluster-level response patterns. Run the notebook cells in order from the repository directory; stored outputs can also be viewed directly.
+
+<p align="center">
+  <img src="Images/shap_feature_importance.png" alt="Citywide and cluster-level SHAP feature importance" width="70%">
+</p>
+
+Citywide and cluster-level patterns describing the relationships between pedestrian activity, pedestrian wait time, and vehicle speed are shown in the following figures.
+
+<p align="center">
+  <img src="Images/pedestrian_wait_time_patterns.png" alt="Citywide and cluster-level response patterns for pedestrian wait time" width="49%">
+  <img src="Images/vehicle_speed_patterns.png" alt="Citywide and cluster-level response patterns for vehicle speed" width="49%">
+</p>
+
+The application accompanies *A Reusable and Automated Decision-Support Framework for Adaptive Pedestrian Planning: Identifying Nonlinear and Context-Dependent Pedestrian Activity Response Patterns*.
+
+## Contact and acknowledgements
+
+Contact [shamshiripour@arizona.edu](mailto:shamshiripour@arizona.edu) or [danialchekani@arizona.edu](mailto:danialchekani@arizona.edu).
+
+We thank the Pima Association of Governments, City of Tucson, Arizona Department of Transportation, Center for Applied Transportation Sciences, and Dr. Xiaofeng Li for data access, support, and comments. The opinions and findings are those of the authors and do not necessarily reflect PAG's views.

@@ -20,3 +20,15 @@ Old_Version/
 
 Pedestrian_model.ipynb
 Data_Collection.ipynb
+# Generated analysis runs and development artifacts.
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+
+# Current automated analysis results.
+Outputs/framework/
+Outputs/.framework-*/
+
+# Local modeling notebook.
+Pedestrian_model_clean.ipynb
