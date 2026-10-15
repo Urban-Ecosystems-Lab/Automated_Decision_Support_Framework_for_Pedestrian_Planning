@@ -1,4 +1,4 @@
-# Automated Pattern Identification Framework
+# Automated Decision Support Framework for Adaptive Pedestrian Planning
 
 This repository provides an automated framework for identifying interpretable response patterns in machine-learning explanations. It fits and compares candidate functional forms to SHapley Additive exPlanations (SHAP) dependence values and reports their direction, shape, potential thresholds, and fit statistics. Citywide and cluster-level analyses help characterize relationships that vary across local conditions.
 
